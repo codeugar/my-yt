@@ -5,11 +5,7 @@ services:
     working_dir: /app
     volumes:
      - ./data:/app/data
-     - /opt/cookies.txt:/app/cookies.txt
     ports:
     - "5050:3000"
     command: npm start
     # network_mode: host
-volumes:
-  data:
-    driver: local
