@@ -6,13 +6,9 @@ class VideoQualityForm extends HTMLElement {
     this.render()
     this.registerEvents()
 
-    window.fetch('/api/video-quality', {
-      method: 'GET'
-    }).then(response => response.json())
-    .then((videoQuality) => {
-      console.log('video quality', videoQuality)
-      this.querySelector('#video-quality').value = +videoQuality
-    })
+    fetch('/api/video-quality')
+    .then(response => response.json())
+    .then((videoQuality) => this.querySelector('#video-quality').value = +videoQuality)
     .catch(error => console.error('Error:', error))
   }
   disconnectedCallback () {
@@ -46,12 +42,9 @@ class VideoQualityForm extends HTMLElement {
 
   setVideoQualityHandler (event) {
     event.preventDefault()
-    console.log('change video quality', event.target.value)
-    window.fetch('/api/video-quality', {
+    fetch('/api/video-quality', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: event.target.value
     })
   }

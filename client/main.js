@@ -1,23 +1,44 @@
 import Store from '/lib/store.js'
+import { createVideoElement } from '/lib/utils.js'
 const store = new Store()
-window.store = store
-window.createVideoElement = createVideoElement
 
-
-// app: sse updates and renders
-const eventSource = new window.EventSource('/')
-let $videosContainer = document.querySelector('.main-videos-container')
-
+const eventSource = new EventSource('/')
 eventSource.onmessage = (message) => {
   if (!message || !message.data) return console.error('skipping empty message')
   try {
     const data = JSON.parse(message.data, {})
     console.log('[sse] message', data)
 
+    if (data.type === 'state' && data.state) {
+      const $state = document.querySelector('.state')
+      if (!$state) { return console.warn('missing $state') }
+      const $count = $state.querySelector('.count')
+      const $downloading = $state.querySelector('.downloading')
+      const $summarizing = $state.querySelector('.summarizing')
+      const downloadingCount = Object.keys(data.state.downloading || {}).length
+      $downloading.innerText = `Downloading: ${downloadingCount}`
+      const summarizingCount = Object.keys(data.state.summarizing || {}).length
+      $summarizing.innerText = `Summarizing: ${summarizingCount}`
+
+      setTimeout(() => {
+        Object.keys(data.state.downloading || {}).map((videoId) => {
+          const $video = document.querySelector(`video-element[data-video-id="${videoId}"]`)
+          if ($video) $video.dataset['downloading'] = "true"
+        })
+        Object.keys(data.state.summarizing || {}).map((videoId) => {
+          const $video = document.querySelector(`video-element[data-video-id="${videoId}"]`)
+          if ($video) $video.dataset['summarizing'] = "true"
+        })
+        const count = Object.keys(data.state.summarizing).length + Object.keys(data.state.downloading).length
+        $count.innerText = count > 0 ? `(${count})` : ''
+      }, 500)
+      return
+    }
     if (data.type === 'download-log-line' && data.line) {
-      const $downloadLog = document.querySelector('.download-log')
-      $downloadLog.open = true
-      const $downloadLogLines = document.querySelector('.download-log .lines')
+      const $state = document.querySelector('.state')
+      if (!$state) { return console.warn('missing $state') }
+
+      const $downloadLogLines = $state.querySelector(' .lines')
       const text = $downloadLogLines.innerText
       let lines = text.split('\n')
       lines = lines.join('\n') + '\n' + data.line
@@ -27,14 +48,14 @@ eventSource.onmessage = (message) => {
     }
     
     if (data.type === 'new-videos' && data.videos) {
-      $videosContainer = document.querySelector('.main-videos-container')
+      const $videosContainer = document.querySelector('.main-videos-container')
       if (!$videosContainer) return
       const showOriginalThumbnail = store.get(store.showOriginalThumbnailKey)
 
       data.videos.forEach(video => {
         const $videoElement = $videosContainer.querySelector('video-element')
         if (!$videoElement) return $videosContainer.appendChild(createVideoElement(video, showOriginalThumbnail))
-        $videoElement.parentNode.insertBefore(createVideoElement(video, showOriginalThumbnail), $videoElement.nextSibling)
+        $videoElement.parentNode.insertBefore(createVideoElement(video, showOriginalThumbnail), $videoElement)
       })
       return
     }
@@ -78,8 +99,6 @@ eventSource.onmessage = (message) => {
 }
 
 
-
-// summary modal
 const $summary = document.querySelector('dialog#summary')
 const $closeSummary = $summary.querySelector("button")
 $closeSummary.addEventListener("click", () => $summary.close())
@@ -96,13 +115,4 @@ function observeDialogOpenPreventScroll (dialog) {
       }
     }
   }).observe(dialog, { attributes: true, childList: true, subtree: true })
-}
-
-function createVideoElement (video, showOriginalThumbnail = false) {
-  const $video = document.createElement('video-element')
-  $video.dataset['data'] = JSON.stringify(Object.assign(video, showOriginalThumbnail ? {
-    thumbnail: video.thumbnail.replace('mq2.jpg', 'mqdefault.jpg')
-  } : {}))
-  $video.dataset['videoId'] = video.id
-  return $video
 }

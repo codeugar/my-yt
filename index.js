@@ -5,9 +5,12 @@ import { createServer } from './lib/server.js'
 
 async function main ({port = 3000, connections = []} = {}) {
   const repo = new Repository()
+  const state = {
+    downloading: {},
+    summarizing: {},
+  }
 
-  
-  createServer({repo, port, connections})
+  createServer({repo, state, port, connections})
   .listen(port, () => {
     console.log(`Server running at http://${os.hostname()}:${port} (or http://localhost:${port})`)
   })

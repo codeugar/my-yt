@@ -10,10 +10,10 @@
 <body>
   <header>
     <div class="flex space-between p-1">
-      <a id="home-link" class="hide p-v" href="/">go back home</a></h1>
-      <div class="flex-1 p-v header-spacer"></div>
-      <search-videos class="p-v"></search-videos>
-      <div class="flex-1 tar p-v">
+      <a id="home-link" class="hide p-v-2" href="/">go back home</a></h1>
+      <div class="flex-1 header-spacer"></div>
+      <search-videos></search-videos>
+      <div class="flex-1 tar p-v-2">
         <a href="/settings">Settings</a>
         <a tabindex="-1" href="https://github.com/christian-fei/my-yt" target="_blank">📖</a>
       </div>
@@ -22,9 +22,13 @@
 
   <main></main>
   
-  <details class="download-log">
-    <summary>Download Log</summary>
-    <div class="lines"></div>
+  <details class="state">
+    <summary>state & logs <span class="count"></span></summary>
+    <div class="flex mt-1">
+      <div class="flex-1 gap downloading">Downloading</div>
+      <div class="flex-1 gap summarizing">Summarizing</div>
+    </div>
+    <pre class="lines"></pre>
   </details>
 
   <dialog id="summary">
@@ -52,27 +56,53 @@
       <br>
       <manage-disk-space-form></manage-disk-space-form>
       <br>
+      <transcode-videos-form></transcode-videos-form>
+      <br>
       <form>
-        <label for="show-thumbnails">
-          Show video thumbnails 
-        </label>
-        <input type="checkbox" id="show-thumbnails"/>
+        <div class="flex space-between">
+          <label for="show-thumbnails">
+            Show video thumbnails 
+          </label>
+          <input type="checkbox" id="show-thumbnails"/>
+        </div>
       </form>
       <br>
       <form>
-        <label for="show-big-player">
-          Show big video player 
-        </label>
-        <input type="checkbox" id="show-big-player"/>
+        <div class="flex space-between">
+          <label for="show-big-player">
+            Show big video player 
+          </label>
+          <input type="checkbox" id="show-big-player"/>
+        </div>
         <div><small>When playing a video inline, it takes up a bit more space</small></div>
       </form>
       <br>
       <form>
-        <label for="show-original-thumbnail">
-          Show original thumbnail (potentially clickbait) 
-        </label>
-        <input type="checkbox" id="show-original-thumbnail"/>
+        <div class="flex space-between">
+          <label for="show-original-thumbnail">
+            Show original thumbnail (potentially clickbait) 
+          </label>
+          <input type="checkbox" id="show-original-thumbnail"/>
+        </div>
         <div><small>Show the creators chosen thumbnail, or a neutral one based on the actual video frames</small></div>
+      </form>
+      <br>
+      <form>
+        <div class="flex space-between">
+          <label for="show-captions">
+            Show video captions
+          </label>
+          <input type="checkbox" id="show-captions"/>
+        </div>
+      </form>
+      <br>
+      <form>
+        <div class="flex space-between">
+          <label for="use-tldw-tube">
+            Use TLDW.tube for video summarization (opens externally)
+          </label>
+          <input type="checkbox" id="use-tldw-tube"/>
+        </div>
       </form>
       <br>
       <manage-channels-form></manage-channels-form>
@@ -88,7 +118,6 @@
     </div>
   </template>
 
-  <script type="module" src="/lib/utils.js"></script>
   <script type="module" src="/components/empty-state.js"></script>
   <script type="module" src="/components/search-videos.js"></script>
   <script type="module" src="/components/channels-list.js"></script>
@@ -97,6 +126,7 @@
   <script type="module" src="/components/manage-channels-form.js"></script>
   <script type="module" src="/components/video-quality-form.js"></script>
   <script type="module" src="/components/manage-disk-space-form.js"></script>
+  <script type="module" src="/components/transcode-videos-form.js"></script>
   <script type="module" src="/main.js"></script>
   <script type="module" src="/lib/router.js"></script>
 </body>

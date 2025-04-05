@@ -1,7 +1,7 @@
 import {test, describe} from 'node:test'
 import fs from 'fs'
 import assert from 'assert'
-import { searchVideosHandler } from '../lib/server.js'
+import { searchVideosHandler } from '../lib/router/api.js'
 import Repository from '../lib/repository.js'
 
 const req = {}

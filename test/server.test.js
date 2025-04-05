@@ -1,9 +1,10 @@
-import {test, describe} from 'node:test'
+import {test, describe, mock} from 'node:test'
 import fs from 'fs'
 import assert from 'assert'
 import { createServer } from '../lib/server.js'
 import Repository from '../lib/repository.js'
 
+mock.timers.enable({ apis: ['setInterval'] });
 let repo
 test.beforeEach(() => {
   if (fs.existsSync('./test/data')) {
@@ -12,7 +13,7 @@ test.beforeEach(() => {
   repo = new Repository('./test/data')
 })
 test('starts server', async () => {
-  const server = createServer({updateVideos: false, repo, connections: []})
+  const server = createServer({repo, connections: []})
   await new Promise(resolve => server.listen(3001, resolve))
   assert.equal(server.address().port, 3001)
   await new Promise(resolve => server.close(resolve))
@@ -21,10 +22,14 @@ test('starts server', async () => {
 describe('server - user flow', () => {
   let server
   test.before((cb) => {
-    server = createServer({updateVideos: false, repo, connections: []})
+    server = createServer({repo, connections: []})
     server.listen(3001, cb)
+    console.log('listening server')
   }, {timeout: 10000})
-  test.after((cb) => server.close(cb), {timeout: 10000})
+  test.after((cb) => {
+    server.close(cb)
+    console.log('closed server')
+  }, {timeout: 10000})
 
   test('get channels', {timeout: 5000}, async () => {
     const res = await fetch('http://0.0.0.0:3001/api/channels')

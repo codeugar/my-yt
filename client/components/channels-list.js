@@ -1,3 +1,4 @@
+import { addClickListener, removeClickListener } from "/lib/utils.js"
 class ChannelsList extends HTMLElement {
   constructor () {
     super()
@@ -36,25 +37,27 @@ class ChannelsList extends HTMLElement {
   }
   registerEvents() {
     const channels = this.querySelectorAll('.channel')
-    channels.forEach(channel => window.utils.addClickListener(channel, this.channelClick.bind(this)))
+    channels.forEach(channel => addClickListener(channel, this.channelClick.bind(this)))
   }
   unregisterEvents() {
     const channels = this.querySelectorAll('.channel')
-    channels.forEach(channel => window.utils.removeClickListener(channel, this.channelClick.bind(this)))
+    channels.forEach(channel => removeClickListener(channel, this.channelClick.bind(this)))
   }
   channelClick(event) {
     const $searchInput = document.querySelector('#search')
-    if (!$searchInput) return console.log('missing search field, skipping channel event register')
+    if (!$searchInput) return
+    const channel = `@${event.target.innerText}`
+
     const channels = this.querySelectorAll('.channel')
-    if ($searchInput.value === event.target.innerText) {
+    if ($searchInput.value === channel) {
       $searchInput.value = ''
       event.target.classList.remove('active')
     } else {
-      $searchInput.value = event.target.innerText
+      $searchInput.value = channel
       channels.forEach(c => c.classList.remove('active'))
       event.target.classList.add('active')
     }
-    $searchInput.dispatchEvent(new Event('keyup'))
+    $searchInput.dispatchEvent(new Event('input'))
     setTimeout(() => document.body.scrollIntoView({ top: 0, behavior: 'smooth' }), 10)
   }
 }

@@ -1,3 +1,4 @@
+import { addClickListener, removeClickListener } from "/lib/utils.js"
 class ManageChannelsForm extends HTMLElement {
   constructor () {
     super()
@@ -23,11 +24,11 @@ class ManageChannelsForm extends HTMLElement {
   }
   registerEvents () {
     this.querySelectorAll('[data-channel]')
-    .forEach($channel => window.utils.addClickListener($channel, this.removeChannel.bind(this)))
+    .forEach($channel => addClickListener($channel, this.removeChannel.bind(this)))
   }
   unregisterEvents () {
     this.querySelectorAll('[data-channel]')
-    .forEach($channel => window.utils.removeClickListener($channel, this.removeChannel.bind(this)))
+    .forEach($channel => removeClickListener($channel, this.removeChannel.bind(this)))
   }
   render () {
     this.innerHTML = /*html*/`
